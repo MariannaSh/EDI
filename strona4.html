@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>EDI - FINAL GROUP PROJECT</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- tu -->
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript"> 
+ 
+  function loadData() {
+  $.getJSON("https://api.npoint.io/1d6b2381fb1cfb3be027", function(data) {
+  // Stwórz elementy tabeli HTML z danych
+  let table = $('<table>');
+
+  // Stwórz wiersz z nagłówkami kolumn
+  let tr = $('<tr>');
+  for (let key in data[0]) {
+    let th = $('<th>');
+    th.html(key);
+    tr.append(th);
+  }
+  table.append(tr);
+
+  // Dodaj wiersze z danymi
+  $.each(data, function(index, row) {
+    let tr = $('<tr>');
+    for (let key in row) {
+      let td = $('<td>');
+      td.html(row[key]);
+      tr.append(td);
+    }
+    table.append(tr);
+  });
+
+  // Dodaj tabelę do dokumentu
+  $('body').append(table);
+
+
+  
+          // Przetwórz dane: zlicz ilość osób, które przeżyły oraz które nie przeżyły
+          let survived = 0;
+          let notSurvived = 0;
+          $.each(data, function(index, row) {
+            if (row.czy_przeżył == "tak") {
+              survived++;
+            } else {
+              notSurvived++;
+            }
+          });
+      
+          // Stwórz dane w formacie odpowiednim dla wykresu słupkowego
+          let chartData = {
+            labels: ['Przeżył', 'Nie przeżył'],
+            datasets: [{
+              label: 'Ilość osób',
+              data: [survived, notSurvived],
+              borderWidth: 1 }]
+            
+          };
+
+          // Opcje wykresu słupkowego
+          let chartOptions = {
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          };
+ // Stwórz wykres słupkowy i wyświetl go w elemencie o id "myChart"
+ const ctx = document.getElementById('myChart');
+    new Chart(ctx, {
+      type: 'bar',
+      data: chartData,
+      options: chartOptions
+    });
+
+      let countryCount = new Map();
+      $.each(data, function(index, row) {
+            let count = 0;
+            if (countryCount.has(row.kraj_pochodzenia)) {
+              count = countryCount.get(row.kraj_pochodzenia);
+            }
+            countryCount.set(row.kraj_pochodzenia, count + 1);
+          });
+          console.log(countryCount.keys())
+        
+let pieChartData = {
+    labels: Array.from(countryCount.keys()),
+    datasets: [{
+        label: 'Ilość osób',
+        data: Array.from(countryCount.values()),
+        backgroundColor: ['#FF6384', '#4BC0C0', '#FFCE56', '#E7E9ED', '#36A2EB', '#89A2FA'],
+        hoverOffset: 4
+
+    }]
+};
+
+// Opcje wykresu kołowego
+let pieChartOptions = {};
+
+
+// Stwórz wykres kołowy i wyświetl go w elemencie o id "myPieChart"
+const pieCtx = document.getElementById('myPieChart').getContext('2d');;
+new Chart(pieCtx, {
+    type: 'pie',
+    data: pieChartData,
+    options: pieChartOptions
+});
+});
+  }
+  
+</script>
+</head>
+<style>
+    table {
+    border-collapse: collapse;       /*sposób wyświetlania komórek (collapse-razem,separate-osobno)*/
+    text-align: center;              /*wyśrodkowany tekst*/
+  }
+  
+  th, td {
+    border: 1px solid black;      /*linie komórek tabeli(kolor,grubość,margines wewnetrzny)*/
+    padding: 8px;
+  }
+  
+  th {
+    background-color: lightgray;        /*kolor tła*/
+    font-weight: bold;                     /*szerokość czcionki*/
+  }
+  
+  tr:nth-child(odd) {                       /* pseudo-klasa CSS, która pozwala na selekcję elementu*/
+    background-color: white;               /*nieparzyste komórki--białe, parzyste(even) komórki--szare*/
+  }
+  
+  tr:nth-child(even) {
+    background-color: lightgray;
+  }
+  </style>
+<body>
+    <h1>EDI - FINAL GROUP PROJECT</h1>
+    <h2>Członkowie zespołu: </h2>
+    <ul>
+        <li>Bartłomiej Reguła </li>
+        <li>Zuzanna Zimmer </li>
+        <li>Maryana Shcherba</li>
+    </ul>
+  <button onclick="loadData()">Wczytaj dane</button>
+    <canvas id="myChart"></canvas>
+    <canvas id='myPieChart'></canvas>  
+</body>
+</html>

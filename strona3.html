@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>EDI - FINAL GROUP PROJECT</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- tu -->
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript"> 
+ 
+  function loadData() {
+  $.getJSON("https://my.api.mockaroo.com/EDI.json?key=0af9c810", function(data) {
+  // Stwórz elementy tabeli HTML z danych
+  let table = $('<table>');
+
+  // Stwórz wiersz z nagłówkami kolumn
+  let tr = $('<tr>');
+  for (let key in data[0]) {
+    let th = $('<th>');
+    th.html(key);
+    tr.append(th);
+  }
+  table.append(tr);
+
+  // Dodaj wiersze z danymi
+  $.each(data, function(index, row) {
+    let tr = $('<tr>');
+    for (let key in row) {
+      let td = $('<td>');
+      td.html(row[key]);
+      tr.append(td);
+    }
+    table.append(tr);
+  });
+
+  // Dodaj tabelę do dokumentu
+  $('body').append(table);
+
+
+  
+          // Przetwórz dane: zlicz ilość osób, które przeżyły oraz które nie przeżyły
+          let survived = 0;
+          let notSurvived = 0;
+          $.each(data, function(index, row) {
+            if (row.czy_przeżył == "tak") {
+              survived++;
+            } else {
+              notSurvived++;
+            }
+          });
+      
+          // Stwórz dane w formacie odpowiednim dla wykresu słupkowego
+          let chartData = {
+            labels: ['Przeżył', 'Nie przeżył'],
+            datasets: [{
+              label: 'Ilość osób',
+              data: [survived, notSurvived],
+              borderWidth: 1 }]
+            
+          };
+
+          // Opcje wykresu słupkowego
+          let chartOptions = {
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          };
+ // Stwórz wykres słupkowy i wyświetl go w elemencie o id "myChart"
+ const ctx = document.getElementById('myChart');
+    new Chart(ctx, {
+      type: 'bar',
+      data: chartData,
+      options: chartOptions
+    });
+
+
+    
+      let kraj1 = 1;
+      let kraj2 = 2;
+      let kraj3 = 3;
+      let kraj4 = 4;
+      let kraj5 = 5;
+
+      $.each(data, function(index, row) {
+            if (row.kraj_pochodzenia == "Uganda") {
+              kraj1++;
+            } 
+            if (row.kraj_pochodzenia == "Democratic Republic of the Congo") {
+              kraj2++;
+            } 
+            if (row.kraj_pochodzenia == "Mozambique") {
+              kraj3++;
+            } 
+            if (row.kraj_pochodzenia == "India") {
+              kraj4++;
+            } 
+            if (row.kraj_pochodzenia == "Ghana") {
+              kraj5++;
+            } 
+          });
+        
+let pieChartData = {
+    labels: ['Uganda', 'Democratic Republic of the Congo', 'Mozambique', 'India', 'Ghana'],
+    datasets: [{
+        label: 'Ilość osób',
+        data: [kraj1, kraj2, kraj3, kraj4, kraj5],
+        backgroundColor: ['#FF6384', '#4BC0C0', '#FFCE56', '#E7E9ED', '#36A2EB'],
+        hoverOffset: 4
+
+    }]
+};
+
+// Opcje wykresu kołowego
+let pieChartOptions = {};
+
+
+// Stwórz wykres kołowy i wyświetl go w elemencie o id "myPieChart"
+const pieCtx = document.getElementById('myPieChart').getContext('2d');;
+new Chart(pieCtx, {
+    type: 'pie',
+    data: pieChartData,
+    options: pieChartOptions
+});
+}); loadData();
+  }
+ 
+</script>
+</head>
+<style>
+    table {
+    border-collapse: collapse;       /*sposób wyświetlania komórek (collapse-razem,separate-osobno)*/
+    text-align: center;              /*wyśrodkowany tekst*/
+  }
+  
+  th, td {
+    border: 1px solid black;      /*linie komórek tabeli(kolor,grubość,margines wewnetrzny)*/
+    padding: 8px;
+  }
+  
+  th {
+    background-color: lightgray;        /*kolor tła*/
+    font-weight: bold;                     /*szerokość czcionki*/
+  }
+  
+  tr:nth-child(odd) {                       /* pseudo-klasa CSS, która pozwala na selekcję elementu*/
+    background-color: white;               /*nieparzyste komórki--białe, parzyste(even) komórki--szare*/
+  }
+  
+  tr:nth-child(even) {
+    background-color: lightgray;
+  }
+  </style>
+<body>
+    <h1>EDI - FINAL GROUP PROJECT</h1>
+    <h2>Członkowie zespołu: </h2>
+    <ul>
+        <li>Bartłomiej Reguła </li>
+        <li>Zuzanna Zimmer </li>
+        <li>Maryana Shcherba</li>
+    </ul>
+  <button onclick="loadData()">Wczytaj dane</button>
+    <canvas id="myChart"></canvas>
+    <canvas id='myPieChart'></canvas>  
+</body>
+</html>
